@@ -12,19 +12,19 @@
 
 ## 🎯 TESTES DO MODEL (HangmanModel)
 
-### 1. Inicialização
+### 1. Inicialização 
 
-- [ x ] Quantas tentativas restantes o jogo deve ter ao começar?
-- [ x ] A lista de letras usadas começa vazia ou com algo?
-- [ x ] O jogo está ativo ou já acabou no início?
-- [ x ] O jogador já começa como vencedor?
+- [x] Quantas tentativas restantes o jogo deve ter ao começar?
+- [x] A lista de letras usadas começa vazia ou com algo?
+- [x] O jogo está ativo ou já acabou no início?
+- [x] O jogador já começa como vencedor?
 
 ### 2. Acertos
 
-- [ ] O que `guessLetter()` retorna quando a letra existe na palavra?
-- [ ] Depois de acertar, a letra aparece no `currentWordProgress()`?
-- [ ] As tentativas restantes mudam quando você acerta?
-- [ ] A letra acertada vai para `usedLetters`?
+- [x] O que `guessLetter()` retorna quando a letra existe na palavra?
+- [x] Depois de acertar, a letra aparece no `currentWordProgress()`?
+- [x] As tentativas restantes mudam quando você acerta?
+- [x] A letra acertada vai para `usedLetters`?
 
 ### 3. Erros
 

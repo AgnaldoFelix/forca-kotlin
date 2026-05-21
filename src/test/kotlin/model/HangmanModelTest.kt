@@ -13,6 +13,8 @@ class HangmanModelTest {
         model = HangmanModel(listOf("kotlin"))
     }
 
+//  Inicialização
+
     @Test
     fun `deve começar com 6 tentativas restantes`() {
 
@@ -43,6 +45,55 @@ class HangmanModelTest {
         val venceu = model.isWordGuessed
 
         assertFalse(venceu)
+    }
+
+
+//   Acertos
+
+    @Test
+    fun `deve retornar true quando a letra existe na palavra`() {
+
+        val model = HangmanModel(listOf("kotlin"))
+
+        val resultado = model.guessLetter('k')
+
+        assertTrue(resultado)
+    }
+
+    @Test
+    fun `deve mostrar a letra acertada no progresso da palavra`() {
+        val model = HangmanModel(listOf("kotlin"))
+
+        model.guessLetter('k')
+        val progresso = model.currentWordProgress()
+
+        assertEquals("k _ _ _ _ _", progresso)
+
+    }
+
+    @Test
+    fun `deve manter as tentativas restantes ao acertar letra`() {
+        val model = HangmanModel(listOf("kotlin"))
+
+        val tentativaAntes = model.remainingAttempts
+        model.guessLetter('k')
+
+        val tentativasDepois = model.remainingAttempts
+
+        assertEquals(tentativasDepois, tentativaAntes)
+    }
+
+
+
+    @Test
+    fun `deve adicionar letra acertada a lista de letras usadas`() {
+        val model = HangmanModel(listOf("kotlin"))
+
+        model.guessLetter('k')
+        val letrasUsadas = model.usedLetters
+
+        assertTrue(letrasUsadas.contains('K'))
+
     }
 
 }
