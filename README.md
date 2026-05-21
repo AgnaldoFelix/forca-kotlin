@@ -4,9 +4,7 @@
 1. [Testes do Model](#testes-do-model)
 2. [Testes do Controller](#testes-do-controller)
 3. [Testes da View](#testes-da-view)
-4. [Questões de MockK](#questões-de-mockk)
-5. [Questões de Depuração](#questões-de-depuração)
-6. [Como Pedir Ajuda](#como-pedir-ajuda)
+
 
 ---
 
