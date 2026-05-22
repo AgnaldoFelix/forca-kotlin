@@ -26,17 +26,17 @@
 
 ### 3. Erros
 
-- [ ] O que `guessLetter()` retorna quando a letra NÃO existe na palavra?
-- [ ] Quantas tentativas restantes são perdidas a cada erro?
-- [ ] A letra errada vai para `usedLetters`?
-- [ ] Depois de 1 erro, `remainingAttempts` é 5 ou continua 6?
+- [x] O que `guessLetter()` retorna quando a letra NÃO existe na palavra?
+- [x] Quantas tentativas restantes são perdidas a cada erro?
+- [x] A letra errada vai para `usedLetters`?
+- [x] Depois de 1 erro, `remainingAttempts` é 5 ou continua 6?
 
 ### 4. Repetição de Letras
 
-- [ ] O que acontece se você chutar a MESMA letra errada duas vezes?
-- [ ] O contador de erros aumenta na segunda vez?
-- [ ] O que `guessLetter()` retorna na segunda vez?
-- [ ] A letra é adicionada novamente ao conjunto de letras usadas?
+- [x] O que acontece se você chutar a MESMA letra errada duas vezes?
+- [x] O contador de erros aumenta na segunda vez?
+- [x] O que `guessLetter()` retorna na segunda vez?
+- [x] A letra é adicionada novamente ao conjunto de letras usadas?
 
 ### 5. Vitória
 
