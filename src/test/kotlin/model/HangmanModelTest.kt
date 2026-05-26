@@ -167,4 +167,99 @@ class HangmanModelTest {
 
         assertEquals(1, quantidadeDeVezesQueAparece)
     }
+
+//    VITÓRIA
+@Test
+fun `deve indicar que jogador venceu ao acertar todas letras`() {
+    val model = HangmanModel(listOf("abc"))
+
+    model.guessLetter('a')
+    model.guessLetter('b')
+    model.guessLetter('c')
+
+    val jogadorVenceu = model.isWordGuessed
+    assertTrue(jogadorVenceu)
+}
+
+    @Test
+    fun `deve terminar o jogo quando jogador vence`() {
+        val model = HangmanModel(listOf("abc"))
+
+        model.guessLetter('a')
+        model.guessLetter('b')
+        model.guessLetter('c')
+
+        val jogoTerminou = model.isGameOver
+        assertTrue(jogoTerminou)
+    }
+
+    @Test
+    fun `deve manter tentativas restantes ao vencer`() {
+        val model = HangmanModel(listOf("abc"))
+
+        val tentativasAntes = model.remainingAttempts
+
+        model.guessLetter('a')
+        model.guessLetter('b')
+        model.guessLetter('c')
+
+        val tentativasDepois = model.remainingAttempts
+
+        assertEquals(tentativasAntes, tentativasDepois)
+    }
+
+
+    @Test
+    fun`deve encerrar o jogo quanto atingir o limite de erros`(){
+        val model = HangmanModel(listOf("abc"))
+
+        model.guessLetter('t')
+        model.guessLetter('p')
+        model.guessLetter('o')
+        model.guessLetter('i')
+        model.guessLetter('g')
+        model.guessLetter('h')
+        model.guessLetter('m')
+
+
+        val jogoEncerrado = model.isGameOver
+
+        assertTrue(jogoEncerrado)
+
+    } @Test
+    fun `nao deve vencer ao perder o jogo`() {
+        val model = HangmanModel(listOf("xyz"))
+
+        repeat(6) {
+            model.guessLetter('a')
+        }
+
+        var jogadorPerdeu = model.isWordGuessed
+
+        assertFalse(jogadorPerdeu)
+    }
+
+
+    @Test
+    fun `nao deve alterar estado ao tentar jogar depois de perder`() {
+        val model = HangmanModel(listOf("xyz"))
+
+        repeat(6) {
+            model.guessLetter('a')
+        }
+
+        val tentativasAntes = model.remainingAttempts
+        val resultado = model.guessLetter('b')
+        val tentativasDepois = model.remainingAttempts
+
+        val tentativas = tentativasAntes == tentativasDepois
+
+        model.isGameOver
+        assertTrue(tentativas)
+
+    }
+
+
+
+
 }
