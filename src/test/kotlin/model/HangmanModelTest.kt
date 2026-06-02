@@ -2,6 +2,8 @@ import model.HangmanModel
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.IOException
+import org.junit.jupiter.api.assertThrows
 
 class HangmanModelTest {
     private lateinit var model: HangmanModel
@@ -12,254 +14,212 @@ class HangmanModelTest {
     }
 
     // ========== INICIALIZAÇÃO ==========
-
     @Test
-    fun `deve começar com 6 tentativas restantes`() {
-        val tentativasRestantes = model.remainingAttempts
-        assertEquals(6, tentativasRestantes)
+    fun `deve inicializar corretamente`() {
+        assertEquals(6, model.remainingAttempts)
+        assertEquals("", model.usedLetters)
+        assertFalse(model.isGameOver)
+        assertFalse(model.isWordGuessed)
     }
 
+    // ========== ACERTO ==========
     @Test
-    fun `deve iniciar com lista de letras usadas vazia`() {
-        val letrasUsadas = model.usedLetters
-        assertEquals("", letrasUsadas)
-    }
-
-    @Test
-    fun `deve começar com o jogo ativo`() {
-        val jogoEstaTerminado = model.isGameOver
-        assertFalse(jogoEstaTerminado)
-    }
-
-    @Test
-    fun `deve começar com jogador não vencedor`() {
-        val jogadorVenceu = model.isWordGuessed
-        assertFalse(jogadorVenceu)
-    }
-
-    // ========== ACERTOS ==========
-
-    @Test
-    fun `deve retornar true quando a letra existe na palavra`() {
-        val model = HangmanModel(listOf("kotlin"))
-        val letraExiste = model.guessLetter('k')
-        assertTrue(letraExiste)
-    }
-
-    @Test
-    fun `deve mostrar a letra acertada no progresso da palavra`() {
+    fun `deve processar acerto de letra corretamente`() {
         val model = HangmanModel(listOf("kotlin"))
 
-        model.guessLetter('k')
-        val progressoAtual = model.currentWordProgress()
+        val acertou = model.guessLetter('k')
 
-        assertEquals("k _ _ _ _ _", progressoAtual)
+        assertTrue(acertou)
+        assertEquals("k _ _ _ _ _", model.currentWordProgress())
+        assertEquals(6, model.remainingAttempts)
+        assertTrue(model.usedLetters.contains("K"))
+        assertFalse(model.isGameOver)
+        assertFalse(model.isWordGuessed)
     }
 
+    // ========== ERRO ==========
     @Test
-    fun `deve manter as tentativas restantes ao acertar letra`() {
+    fun `deve processar erro de letra corretamente`() {
         val model = HangmanModel(listOf("kotlin"))
 
-        val tentativasAntesDoAcerto = model.remainingAttempts
-        model.guessLetter('k')
-        val tentativasDepoisDoAcerto = model.remainingAttempts
+        val acertou = model.guessLetter('x')
 
-        assertEquals(tentativasDepoisDoAcerto, tentativasAntesDoAcerto)
+        assertFalse(acertou)
+        assertEquals("_ _ _ _ _ _", model.currentWordProgress())
+        assertEquals(5, model.remainingAttempts)
+        assertTrue(model.usedLetters.contains("X"))
+        assertFalse(model.isGameOver)
+        assertFalse(model.isWordGuessed)
     }
 
+    // ========== REPETIÇÃO ==========
     @Test
-    fun `deve adicionar letra acertada a lista de letras usadas`() {
-        val model = HangmanModel(listOf("kotlin"))
-
-        model.guessLetter('k')
-        val listaDeLetrasUsadas = model.usedLetters
-
-        assertTrue(listaDeLetrasUsadas.contains('K'))
-    }
-
-    // ========== ERROS ==========
-
-    @Test
-    fun `deve retornar false quando letra NAO existe na palavra`() {
-        val model = HangmanModel(listOf("kotlin"))
-
-        val letraNaoExiste = model.guessLetter('z')
-
-        assertFalse(letraNaoExiste)
-    }
-
-    @Test
-    fun `deve diminuir 1 tentativa a cada erro`() {
-        val model = HangmanModel(listOf("kotlin"))
-
-        val tentativasAntesDoErro = model.remainingAttempts
-        model.guessLetter('z')
-        val tentativasDepoisDoErro = model.remainingAttempts
-
-        assertEquals(5, tentativasDepoisDoErro)
-    }
-
-    @Test
-    fun `deve adicionar letra errada a lista de letras usadas`() {
-        val model = HangmanModel(listOf("kotlin"))
-
-        model.guessLetter('z')
-        val listaDeLetrasUsadas = model.usedLetters
-
-        assertTrue(listaDeLetrasUsadas.contains("Z"))
-    }
-
-    @Test
-    fun `deve ter 5 tentativas restantes apos 1 erro`() {
-        val model = HangmanModel(listOf("kotlin"))
-
-        model.guessLetter('y')
-        val tentativasAposUmErro = model.remainingAttempts
-
-        assertEquals(5, tentativasAposUmErro)
-    }
-
-    // ========== REPETIÇÃO DE LETRAS ==========
-
-    @Test
-    fun `deve retornar false ao tentar letra repetida`() {
+    fun `nao deve processar letra repetida`() {
         val model = HangmanModel(listOf("kotlin"))
 
         model.guessLetter('x')
-        val letraRepetida = model.guessLetter('x')
+        val tentativasAposPrimeiro = model.remainingAttempts
+        val letrasUsadasAposPrimeiro = model.usedLetters
 
-        assertFalse(letraRepetida)
+        val resultadoRepetido = model.guessLetter('x')
+
+        assertFalse(resultadoRepetido)
+        assertEquals(tentativasAposPrimeiro, model.remainingAttempts)
+        assertEquals(letrasUsadasAposPrimeiro, model.usedLetters)
+        assertEquals(5, model.remainingAttempts)
+        assertEquals(1, model.usedLetters.count { it == 'X' })
     }
 
+    // ========== VITÓRIA ==========
     @Test
-    fun `nao deve alterar tentativas restantes ao repetir letra`() {
-        val model = HangmanModel(listOf("kotlin"))
-
-        model.guessLetter('x')
-        val tentativasAposPrimeiraTentativa = model.remainingAttempts
-
-        model.guessLetter('x')
-        val tentativasAposSegundaTentativa = model.remainingAttempts
-
-        assertEquals(tentativasAposPrimeiraTentativa, tentativasAposSegundaTentativa)
-    }
-
-    @Test
-    fun `deve manter 5 tentativas apos tentar letra repetida`() {
-        val model = HangmanModel(listOf("kotlin"))
-
-        model.guessLetter('x')
-        model.guessLetter('x')
-
-        val tentativasRestantes = model.remainingAttempts
-
-        assertEquals(5, tentativasRestantes)
-    }
-
-    @Test
-    fun `nao deve adicionar letra repetida ao conjunto de letras usadas`() {
-        val model = HangmanModel(listOf("kotlin"))
-
-        model.guessLetter('x')
-        model.guessLetter('x')
-
-        val quantidadeDeVezesQueAparece = model.usedLetters.count { it == 'X' }
-
-        assertEquals(1, quantidadeDeVezesQueAparece)
-    }
-
-//    VITÓRIA
-@Test
-fun `deve indicar que jogador venceu ao acertar todas letras`() {
-    val model = HangmanModel(listOf("abc"))
-
-    model.guessLetter('a')
-    model.guessLetter('b')
-    model.guessLetter('c')
-
-    val jogadorVenceu = model.isWordGuessed
-    assertTrue(jogadorVenceu)
-}
-
-    @Test
-    fun `deve terminar o jogo quando jogador vence`() {
+    fun `deve vencer ao acertar todas as letras`() {
         val model = HangmanModel(listOf("abc"))
 
         model.guessLetter('a')
         model.guessLetter('b')
-        model.guessLetter('c')
+        val tentativasAntes = model.remainingAttempts
+        val acertouUltima = model.guessLetter('c')
 
-        val jogoTerminou = model.isGameOver
-        assertTrue(jogoTerminou)
+        assertTrue(acertouUltima)
+        assertTrue(model.isWordGuessed)
+        assertTrue(model.isGameOver)
+        assertEquals(tentativasAntes, model.remainingAttempts)
+        assertEquals("a b c", model.currentWordProgress())
     }
 
+    // ========== DERROTA ==========
     @Test
-    fun `deve manter tentativas restantes ao vencer`() {
-        val model = HangmanModel(listOf("abc"))
+    fun `deve perder ao atingir 6 erros`() {
+        val model = HangmanModel(listOf("xyz"))
+
+        listOf('a', 'b', 'c', 'd', 'e', 'f').forEach { model.guessLetter(it) }
+
+        assertTrue(model.isGameOver)
+        assertFalse(model.isWordGuessed)
+        assertEquals(0, model.remainingAttempts)
 
         val tentativasAntes = model.remainingAttempts
-
-        model.guessLetter('a')
-        model.guessLetter('b')
-        model.guessLetter('c')
-
+        val resultado = model.guessLetter('x')
         val tentativasDepois = model.remainingAttempts
 
+        assertTrue(resultado)
         assertEquals(tentativasAntes, tentativasDepois)
     }
 
-
+    // ========== CASE INSENSITIVE ==========
     @Test
-    fun`deve encerrar o jogo quanto atingir o limite de erros`(){
-        val model = HangmanModel(listOf("abc"))
+    fun `deve tratar letras maiusculas e minusculas de forma case-insensitive`() {
+        val model = HangmanModel(listOf("kotlin"))
 
-        model.guessLetter('t')
-        model.guessLetter('p')
-        model.guessLetter('o')
-        model.guessLetter('i')
-        model.guessLetter('g')
-        model.guessLetter('h')
-        model.guessLetter('m')
+        val acertouMaiusculo = model.guessLetter('K')
+        assertTrue(acertouMaiusculo)
 
+        val progressoAposK = model.currentWordProgress()
+        assertEquals("k _ _ _ _ _", progressoAposK)
+        assertTrue(model.usedLetters.contains("K"))
 
-        val jogoEncerrado = model.isGameOver
+        val acertouMinusculo = model.guessLetter('o')
+        assertTrue(acertouMinusculo)
 
-        assertTrue(jogoEncerrado)
-
-    } @Test
-    fun `nao deve vencer ao perder o jogo`() {
-        val model = HangmanModel(listOf("xyz"))
-
-        repeat(6) {
-            model.guessLetter('a')
-        }
-
-        var jogadorPerdeu = model.isWordGuessed
-
-        assertFalse(jogadorPerdeu)
+        val progressoAposO = model.currentWordProgress()
+        assertEquals("k o _ _ _ _", progressoAposO)
+        assertTrue(model.usedLetters.contains("O"))
     }
 
+    // ========== FORMATAÇÃO ==========
+    @Test
+    fun `deve formatar saidas corretamente`() {
+        val model = HangmanModel(listOf("kotlin"))
+
+        model.guessLetter('c')
+        model.guessLetter('a')
+        model.guessLetter('b')
+
+        val letrasUsadas = model.usedLetters
+        assertEquals("A, B, C", letrasUsadas)
+
+        model.guessLetter('k')
+        model.guessLetter('o')
+
+        val progresso = model.currentWordProgress()
+        assertEquals("k o _ _ _ _", progresso)
+    }
+
+
+    // ========== PALAVRAS ==========
+    @Test
+    fun `deve funcionar com palavra de uma letra`() {
+        val model = HangmanModel(listOf("a"))
+
+        val acertou = model.guessLetter('a')
+
+       assertTrue(acertou)
+       assertTrue(model.isWordGuessed)
+       assertTrue(model.isGameOver)
+       assertEquals("a", model.currentWordProgress())
+    }
+
+    @Test
+    fun `deve revelar todas as ocorrencias de uma letra repetida`() {
+        val model = HangmanModel(listOf("paralelepipedo"))
+
+        model.guessLetter('p')
+        val progresso = model.currentWordProgress()
+
+        val quantidade = progresso.count { it == 'p' }
+         assertEquals(3, quantidade)
+
+        assertEquals("p _ _ _ _ _ _ _ p _ p _ _ _", progresso)
+    }
+
+
+    @Test
+    fun `deve lancar excecao quando lista de palavras for vazia`() {
+        assertThrows<NoSuchElementException> {
+            HangmanModel(emptyList())
+        }
+    }
+
+    @Test
+    fun `deve converter palavras maiusculas para minusculas`() {
+        val model = HangmanModel(listOf("KOTLIN"))
+
+        val acertou = model.guessLetter('k')
+
+        assertTrue(acertou)
+        assertEquals("k _ _ _ _ _", model.currentWordProgress())
+    }
+
+// ========== LIMITES ==========
 
     @Test
     fun `nao deve alterar estado ao tentar jogar depois de perder`() {
-        val model = HangmanModel(listOf("xyz"))
+        val model = HangmanModel(listOf("abc"))
 
-        repeat(6) {
-            model.guessLetter('a')
-        }
+        listOf('z', 'x', 'y', 'w', 'v', 'u').forEach { model.guessLetter(it) }
 
-        val tentativasAntes = model.remainingAttempts
-        val resultado = model.guessLetter('b')
-        val tentativasDepois = model.remainingAttempts
+        val remainingAntes = model.remainingAttempts
+        val gameOverAntes = model.isGameOver
 
-        val tentativas = tentativasAntes == tentativasDepois
+        model.guessLetter('t')
+        model.guessLetter('r')
+        model.guessLetter('s')
 
-        model.isGameOver
-        assertTrue(tentativas)
-
+        assertEquals(remainingAntes, model.remainingAttempts)
+        assertEquals(gameOverAntes, model.isGameOver)
     }
 
+    @Test
+    fun `nao deve vencer ao acertar letra depois de perder`() {
+        val model = HangmanModel(listOf("abc"))
 
+        listOf('z', 'x', 'y', 'w', 'v', 'u').forEach { model.guessLetter(it) }
 
+        val acertou = model.guessLetter('a')
 
+        assertTrue(acertou)
+        assertFalse(model.isWordGuessed)
+        assertTrue(model.isGameOver)
+        assertEquals(0, model.remainingAttempts)
+    }
 }

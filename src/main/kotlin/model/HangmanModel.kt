@@ -8,7 +8,7 @@ class HangmanModel(wordList: List<String>) {
 
     val isGameOver: Boolean get() = errors >= maxErrors || isWordGuessed
     val isWordGuessed: Boolean get() = targetWord.all { it in guessedLetters }
-    val remainingAttempts: Int get() = maxErrors - errors
+    val remainingAttempts: Int get() = (maxErrors - errors).coerceAtLeast(0)
     val usedLetters: String get() = guessedLetters.sorted().joinToString(", ").uppercase()
 
     fun getWord(): String = targetWord
