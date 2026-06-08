@@ -18,7 +18,17 @@ class HangmanView {
     fun askForLetter(): Char {
         print("Digite uma letra: ")
         val input = readlnOrNull()?.trim() ?: ""
-        return input.getOrNull(0) ?: ' '
+        return when {
+            input.isEmpty() -> ' '
+            input.length > 1 -> ' '
+            !input[0].isLetter() -> ' '
+            else -> input[0].lowercaseChar()
+        }
+    }
+
+    fun askForLetterInput(): String {
+        print("Digite uma letra: ")
+        return readlnOrNull()?.trim() ?: ""
     }
 
     fun showInvalidInput(message: String) {
@@ -50,4 +60,5 @@ class HangmanView {
         println("Tentativas restantes: ${model.remainingAttempts}")
         println("Você perdeu! A palavra era: ${model.getWord()}")
     }
+
 }

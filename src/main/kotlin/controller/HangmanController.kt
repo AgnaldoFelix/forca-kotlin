@@ -3,6 +3,7 @@ package controller
 import model.HangmanModel
 import view.HangmanView
 
+
 class HangmanController(
     private val model: HangmanModel,
     private val view: HangmanView
@@ -12,14 +13,10 @@ class HangmanController(
         view.showTitle()
 
         while (!model.isGameOver) {
-            // Mostra estado atual
             view.showGameState(model)
 
-            // Solicita letra
-            view.askForLetter()
-            val input = readlnOrNull()?.trim() ?: ""
+            val input = view.askForLetterInput()
 
-            // Valida entrada
             when {
                 input.isEmpty() -> {
                     view.showInvalidInput("Nenhuma letra informada. Tente novamente.")
@@ -35,28 +32,29 @@ class HangmanController(
                 }
                 else -> {
                     val letter = input[0]
-                    val wasCorrect = model.guessLetter(letter)
+                    val isRepeated = model.usedLetters.contains(letter.uppercase())
+                    val wasCorrect = if (!isRepeated) model.guessLetter(letter) else false
 
                     when {
-                        !wasCorrect && model.usedLetters.contains(letter.uppercase()) -> {
+                        wasCorrect -> {
+                            view.showFeedback(true, letter)
+                        }
+                        isRepeated -> {
                             view.showRepeatedLetter(letter)
                         }
-                        !wasCorrect -> {
-                            view.showFeedback(false, letter)
-                        }
                         else -> {
-                            view.showFeedback(true, letter)
+                            view.showFeedback(false, letter)
                         }
                     }
                 }
             }
         }
 
-        // Fim do jogo
         if (model.isWordGuessed) {
             view.showVictory(model)
         } else {
             view.showDefeat(model)
         }
     }
+
 }

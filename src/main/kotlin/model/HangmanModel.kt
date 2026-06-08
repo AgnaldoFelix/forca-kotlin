@@ -17,15 +17,15 @@ class HangmanModel(wordList: List<String>) {
         val lowerLetter = letter.lowercaseChar()
 
         if (lowerLetter in guessedLetters) {
-            return false // Letra repetida
+            return false  // letra repetida
         }
 
-        guessedLetters.add(lowerLetter)
+        guessedLetters.add(lowerLetter)  // ← ADICIONA ANTES de verificar!
 
         return if (lowerLetter in targetWord) {
-            true // Acertou
+            true   // acertou
         } else {
-            errors++ // Errou
+            errors++  // errou
             false
         }
     }
